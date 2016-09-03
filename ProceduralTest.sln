@@ -1,0 +1,23 @@
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2008
+
+Project("{8DC68997-85FE-89DE-B2C3-A6CA7997C4B3}") = "ProceduralTest", "Assembly-CSharp.csproj", "{ACFBEFE3-0EDC-9F30-E4EE-C6B9353E54A3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ACFBEFE3-0EDC-9F30-E4EE-C6B9353E54A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACFBEFE3-0EDC-9F30-E4EE-C6B9353E54A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACFBEFE3-0EDC-9F30-E4EE-C6B9353E54A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACFBEFE3-0EDC-9F30-E4EE-C6B9353E54A3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Assembly-CSharp.csproj
+	EndGlobalSection
+EndGlobal
