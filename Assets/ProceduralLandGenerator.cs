@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using System.Collections;
+using System.Linq;
 
 public class ProceduralLandGenerator : MonoBehaviour {
     Mesh mesh;
@@ -20,6 +21,8 @@ public class ProceduralLandGenerator : MonoBehaviour {
     public int mountainWidth = 5;
     [Range(0.0f, 2.0f)]
     public float mountainHeight = 1;
+    [Range(1f, 20f)]
+    public float maxHeight = 10;
 
     public int seed;
 
@@ -47,6 +50,7 @@ public class ProceduralLandGenerator : MonoBehaviour {
 
 	public void Start () {
         mesh = GetComponent<MeshFilter>().mesh;
+       
         originalVerts = mesh.vertices;
         Generate();
         
@@ -79,6 +83,8 @@ public class ProceduralLandGenerator : MonoBehaviour {
     }
     Vector3[][] ToGrid(Vector3[] input)
     {
+        //SortArray(input);
+
         int sq = Mathf.RoundToInt(Mathf.Sqrt(input.Length));
         Vector3[][] newGrid = new Vector3[sq][];
         
@@ -91,6 +97,11 @@ public class ProceduralLandGenerator : MonoBehaviour {
         }
 
         return newGrid;
+    }
+
+    private void SortArray(Vector3[] arr)
+    {
+        arr = arr.OrderBy(v => v.x).ToArray<Vector3>();
     }
     Vector3[] ToArray(Vector3[][] input)
     {
@@ -110,6 +121,7 @@ public class ProceduralLandGenerator : MonoBehaviour {
     }
     void GenerateMountains(Vector3[][] newVertsGrid)
     {
+        Vector3[][] originalGrid = (Vector3[][])newVertsGrid.Clone();
         for (int i = 0; i < mountains; i++)
         {
             //find a random point inside everything
@@ -119,28 +131,37 @@ public class ProceduralLandGenerator : MonoBehaviour {
             int y = val % newVertsGrid.Length;
             int x = (val - y) / newVertsGrid.Length;
 
-            //print(val + " " + x + " " + y);
+            //print("|||" +val + " " + x + " " + y);
 
-            //Randomize the higher location\
-            newVertsGrid[x][y] +=  mountainHeight * Random.Range(heightFactor * 15, heightFactor * 20) * Vector3.up / transform.localScale.z;
+            //Randomize the peak location
+            float randRange = Random.Range(heightFactor * 15, heightFactor * 20);
+            //print(randRange);
+            newVertsGrid[x][y] = originalGrid[x][y] + (mountainHeight * randRange * Vector3.up / transform.localScale.z) ;
+
+            print(newVertsGrid[x][y].y);
+
+            if (newVertsGrid[x][y].y > maxHeight)
+                newVertsGrid[x][y] = new Vector3(newVertsGrid[x][y].x, maxHeight, newVertsGrid[x][y].z);
 
             //all this mumbo jumbo means that it searches for all parts that are within mountain width, or a mountainWidth * mountanWidth size of a square 
-            for (int k = (x - (mountainWidth/2) < 0 ? 0 : x - (mountainWidth / 2));
-                         k < (x + (mountainWidth / 2) >= newVertsGrid[x].Length ? newVertsGrid[x].Length - 1 : x + (mountainWidth / 2));
+            for (int k = (x - (mountainWidth) < 0 ? 0 : x - (mountainWidth));
+                         k < (x + (mountainWidth) >= newVertsGrid[x].Length ? newVertsGrid[x].Length - 1 : x + (mountainWidth));
                     k++)
             {
                 //print(k);
-                for (int f = (y - (mountainWidth / 2) < 0 ? 0 : y - (mountainWidth / 2));
-                         f < (y + (mountainWidth / 2) >= newVertsGrid[y].Length ? newVertsGrid[y].Length - 1 : y + (mountainWidth / 2));
+                for (int f = (y - (mountainWidth ) < 0 ? 0 : y - (mountainWidth ));
+                         f < (y + (mountainWidth ) >= newVertsGrid[y].Length ? newVertsGrid[y].Length - 1 : y + (mountainWidth ));
                     f++)
                 {
                     //print(f);
                     float distance = Vector2.Distance(new Vector2(k, f), new Vector2(x, y));
-                    print(distance);
-                    if (k != x && f != y)
+                    //print(distance);
+                    if (!(k == x && f == y))
                     {
                         //print(k + " " + f);
-                        newVertsGrid[k][f] += (newVertsGrid[x][y].y / distance) * Vector3.up;
+
+                        //if distance == mountain width, then we will not change anything. 
+                        newVertsGrid[k][f] = originalGrid[k][f] + (newVertsGrid[x][y].y * (mountainWidth - distance > 0?Mathf.Sqrt(mountainWidth - distance):0)) * Vector3.up;
                     }
                 }
             }
